@@ -30,7 +30,7 @@
       class="form"
       :fields="relatedFields"
       :values="langValue"
-      :collection="relation.collection_many"
+      :collection="relation.collection_many.collection"
       @stage-value="stageValue"
     />
   </div>
