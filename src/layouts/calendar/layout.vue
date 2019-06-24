@@ -107,16 +107,23 @@ export default {
       weekNames: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
     };
   },
+  watch: {
+    date(newValue) {
+      this.getData(newValue)
+    }
+  },
   computed: {
     // Get the date of the view based on the delta of the months that the user
     // has scrolled
     date() {
       var date = new Date();
       date = new Date(date.getFullYear(), date.getMonth() + this.monthDistance, 1);
+      console.log(date)
       return date;
     }
   },
   created() {
+    this.getData(this.date)
     this.scroll = _.throttle(this.scroll, 200);
     document.addEventListener("click", this.documentClick);
     document.addEventListener("keypress", this.keyPress);
@@ -126,6 +133,41 @@ export default {
     document.removeEventListener("keypress", this.keyPress);
   },
   methods: {
+    getData(date) {
+      this.$store.dispatch("loadingStart", {
+        id: 'fetch_cal_items'
+      });
+      var dateId = this.viewOptions.date;
+      var datetimeId = this.viewOptions.datetime;
+      var columnName = ""
+      if(datetimeId !== '__none__') {
+        columnName = datetimeId
+      } else {
+        columnName = dateId
+      }
+      
+      var endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+      var from = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
+      var to = endOfMonth.getFullYear() + "-" + (endOfMonth.getMonth() + 1) + "-" + endOfMonth.getDate() + " " + endOfMonth.getHours() + ":" + endOfMonth.getMinutes() + ":" + endOfMonth.getSeconds() 
+      let filter = {
+          [columnName]: {
+            between: from + ',' + to
+          }
+        }
+      this.$api.getItems(this.$parent.collection, {
+          fields: '*.*.*',
+          filter: filter
+        }).then(res => {
+          res.data.forEach(item=>{
+            item.to = 'test'
+          })
+          this.$parent.items = res.data
+          this.$store.dispatch("loadingFinished", 'fetch_cal_items');
+        }).catch( e => {
+          console.log(e)
+          this.$store.dispatch("loadingFinished", 'fetch_cal_items');
+        })
+    },
     increaseYear() {
       this.swipeTo = "right";
       this.monthDistance += 12;
@@ -157,6 +199,8 @@ export default {
     },
 
     openPopup(date) {
+      console.log(date)
+
       this.showPopup = true;
       this.popupDate = date;
     },
@@ -164,6 +208,7 @@ export default {
     eventsAtDay(date) {
       var events = [];
       var dateId = this.viewOptions.date;
+      var datetimeId = this.viewOptions.datetime;
       var titleId = this.viewOptions.title;
       var timeId = this.viewOptions.time;
       var colorId = this.viewOptions.color;
@@ -172,8 +217,21 @@ export default {
 
       for (var i = 0; i < this.$parent.items.length; i++) {
         var item = this.$parent.items[i];
-        var eventDate = new Date(item[dateId] + "T00:00:00");
-        var time = item[timeId] && timeId != 0 ? item[timeId] : "";
+        
+        var eventDate = "", 
+            time = "";
+
+        // datetime first
+        if(datetimeId !== '__none__') {
+          eventDate = new Date(item[datetimeId]);
+          // allow to overridetime of datetime if time field is set
+          if(timeId === '__none__') time = item[datetimeId].slice(-8)
+          else time = item[timeId] && timeId != 0 ? item[timeId] : "";
+        } else {
+          eventDate = new Date(item[dateId] + "T00:00:00");
+          time = item[timeId] && timeId != 0 ? item[timeId] : "";
+        }
+        
         var color = item[colorId];
 
         if (!eventDate) continue;

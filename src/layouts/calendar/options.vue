@@ -1,6 +1,17 @@
 <template>
   <form @submit.prevent>
-    <label for="spacing" class="style-3 required">
+    <label for="spacing" class="style-3" :class="{'required': (viewOptions.date === '__none__')}">
+      {{ $t("layouts-calendar-datetime") }}
+    </label>
+    <v-select
+      id="spacing"
+      :value="viewOptions.datetime || '__none__'"
+      :options="datetimeOptions"
+      class="select"
+      icon="access_time"
+      @input="setOption('datetime', $event)"
+    ></v-select>
+    <label for="spacing" class="style-3" :class="{'required': (viewOptions.datetime === '__none__')}">
       {{ $t("layouts-calendar-date") }}
     </label>
     <v-select
@@ -65,7 +76,17 @@ export default {
       return _.pickBy(options, _.identity);
     },
     dateOptions() {
-      var options = _.mapValues(this.fields, info => (info.type == "date" ? info.name : null));
+      var options = {
+         __none__: `(${this.$t("dont_show")})`,
+         ..._.mapValues(this.fields, info => (info.type == "date" ? info.name : null))
+      };
+      return _.pickBy(options, _.identity);
+    },
+    datetimeOptions() {
+      var options = {
+        __none__: `(${this.$t("dont_show")})`,
+        ..._.mapValues(this.fields, info => (info.type == "datetime" ? info.name : null))
+      };
       return _.pickBy(options, _.identity);
     },
     timeOptions() {
@@ -85,10 +106,11 @@ export default {
   },
   methods: {
     setOption(option, value) {
-      this.$emit("options", {
-        ...this.viewOptions,
+        this.$emit("options", {
+         ...this.viewOptions,
         [option]: value
       });
+
     }
   }
 };

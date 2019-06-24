@@ -477,7 +477,7 @@ export default {
         },
         {
           text: this.$t("delete"),
-          icon: "close"
+          icon: "delete_outline"
         }
       ];
     },

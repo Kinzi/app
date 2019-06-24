@@ -8,7 +8,7 @@
       <a
         v-for="event in eventList"
         :key="event.id"
-        @click.stop="event.to ? $router.push(event.to) : ''"
+        @click.stop="goToItem(event.id)"
       >
         <div
           class="event"
@@ -29,6 +29,11 @@ export default {
   props: ["week", "display", "date", "events"],
   data() {
     return {};
+  },
+  methods: {
+     goToItem(id) {
+      if(id!== -1) this.$router.push(`/collections/${this.$parent.$parent.collection}/${id}`)
+    },
   },
   computed: {
     hidden() {
@@ -140,8 +145,12 @@ export default {
 }
 
 .event-more {
-  color: var(--dark-gray);
+  .title {
+    color: var(--dark-gray);
+  }
   background-color: transparent;
   justify-content: center;
 }
+
+
 </style>

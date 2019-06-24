@@ -37,7 +37,7 @@
             :key="event.title"
             class="event"
             :style="event.color"
-            @click="$router.push(event.to)"
+            @click="goToItem(event.id)"
           >
             <span>{{ event.title }}</span>
             <span>{{ event.time.substr(0, 5) }}</span>
@@ -104,6 +104,10 @@ export default {
       return this.$t("weeks." + this.$parent.weekNames[day == 0 ? 6 : day - 1]).substr(0, 3);
     },
 
+    goToItem(id) {
+      this.$router.push(`/collections/${this.$parent.collection}/${id}`)
+    },
+
     changeDay(distance) {
       this.moveSidebar = "move-" + distance;
       var newDate = new Date(
@@ -123,12 +127,20 @@ export default {
     getEventCount(date) {
       var events = 0;
       var dateId = this.$parent.viewOptions.date;
+      var datetimeId = this.$parent.viewOptions.datetime;
 
-      if (!dateId) return;
+      if (!dateId && !datetimeId) return;
 
       for (var i = 0; i < this.$parent.items.length; i++) {
         var item = this.$parent.items[i];
-        var eventDate = new Date(item[dateId] + "T00:00:00");
+        var eventDate = "";
+
+        // datetime first
+        if(datetimeId !== '__none__') {
+          eventDate = new Date(item[datetimeId]);
+        } else {
+          eventDate = new Date(item[dateId] + "T00:00:00");
+        }
 
         if (this.$parent.isSameDay(date, eventDate)) {
           events++;

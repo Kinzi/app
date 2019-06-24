@@ -70,13 +70,13 @@ export default {
   display: flex;
   flex-direction: column;
   overflow-y: scroll;
-  height: 334px;
+  height: 344px;
   width: 100%;
   max-width: var(--width-medium);
-  border: var(--input-border-width) solid var(--lighter-gray);
   border-radius: var(--border-radius);
   background-color: white;
   padding: 10px;
+  background-color: var(--lightest-gray);
 
   .v-input {
     position: sticky;
@@ -85,7 +85,7 @@ export default {
   }
 
   details {
-    text-transform: uppercase;
+    font-size: 14px;
 
     summary {
       margin: 20px 2px 5px;
@@ -93,7 +93,7 @@ export default {
       color: var(--gray);
 
       &:hover {
-        color: var(--darker-gray);
+        color: var(--darkest-gray);
       }
     }
   }
@@ -105,12 +105,12 @@ export default {
     max-width: 37px;
 
     &.active {
-      color: var(--darker-gray);
+      color: var(--darkest-gray);
     }
 
     &:hover {
       transition: none;
-      color: var(--dark-gray);
+      color: var(--darker-gray);
     }
   }
   button[disabled="disabled"] {

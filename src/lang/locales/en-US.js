@@ -208,6 +208,13 @@ export default {
   field_type: "Field Type",
   field_updated: "{field} Field Updated",
   field_width: "Field Width",
+  field_width_half: "Half Width (Wraps)",
+  field_width_left: "Half Width (Left Only)",
+  field_width_right: "Half Width (Right Only)",
+  field_width_full: "Full Width",
+  field_width_fill: "Fill the Page",
+  field_width_note:
+    "The width of this field within the form's layout. Widths wrap differently, so form placement may also be affected (in combination with the field's sort value).",
   fields: "Fields",
   fields_are_saved_instantly: "Changes to fields are saved instantly",
   fieldtypes: {
@@ -397,6 +404,7 @@ export default {
     "There are different types of relational data, this interface uses one called {relation}.",
   relational: "Relational",
   relationship: "Relationship",
+  relationship_not_setup: "The relationship hasn't been configured correctly.",
   remove: "Remove",
   remove_related: "Remove Related Item",
   report_issue: "Report Issue",

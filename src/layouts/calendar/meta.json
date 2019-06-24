@@ -10,6 +10,7 @@
       "moreEvents": "and {amount} more...",
       "noEvents": "no events yet!",
       "date": "Date",
+      "datetime": "Datetime",
       "time": "Time",
       "title": "Title",
       "color": "Color"
@@ -21,6 +22,7 @@
       "moreEvents": "und {amount} mehr...",
       "noEvents": "noch keine Termine!",
       "date": "Datum",
+      "datetime": "Datetime",
       "time": "Zeit",
       "title": "Titel",
       "color": "Farbe"
@@ -33,6 +35,7 @@
       "moreEvents": "et {amount} plus...",
       "noEvents": "pas encore d'événements positionnés",
       "date": "Date",
+      "datetime": "Datetime",
       "time": "Heure et minute",
       "title": "Titre",
       "color": "Couleur"
