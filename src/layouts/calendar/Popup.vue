@@ -9,10 +9,10 @@
         </div>
         <div id="sidebar" @wheel="scroll">
           <transition :name="moveSidebar">
-            <div id="dates-container" :key="days">
+            <div id="dates-container">
               <div
                 v-for="day in days"
-                :key="day.date.getDate()"
+                :key="day.date.getDate().toString()"
                 class="dates"
                 @click="changeDay(day.index)"
               >
