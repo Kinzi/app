@@ -88,6 +88,8 @@ export default {
 
       popupDate: new Date(),
 
+      events: [],
+
       showMonthSelect: false,
 
       monthNames: [
@@ -107,23 +109,22 @@ export default {
       weekNames: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
     };
   },
-  watch: {
-    date(newValue) {
-      this.getData(newValue)
-    }
-  },
   computed: {
     // Get the date of the view based on the delta of the months that the user
     // has scrolled
     date() {
       var date = new Date();
       date = new Date(date.getFullYear(), date.getMonth() + this.monthDistance, 1);
-      console.log(date)
       return date;
     }
   },
+  watch: {
+    date(newValue) {
+      this.getData(newValue);
+    }
+  },
   created() {
-    this.getData(this.date)
+    this.getData(this.date);
     this.scroll = _.throttle(this.scroll, 200);
     document.addEventListener("click", this.documentClick);
     document.addEventListener("keypress", this.keyPress);
@@ -135,38 +136,63 @@ export default {
   methods: {
     getData(date) {
       this.$store.dispatch("loadingStart", {
-        id: 'fetch_cal_items'
+        id: "fetch_cal_items"
       });
       var dateId = this.viewOptions.date;
       var datetimeId = this.viewOptions.datetime;
-      var columnName = ""
-      if(datetimeId !== '__none__') {
-        columnName = datetimeId
+      var columnName = "";
+      if (datetimeId !== "__none__") {
+        columnName = datetimeId;
       } else {
-        columnName = dateId
+        columnName = dateId;
       }
-      
-      var endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0)
-      var from = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
-      var to = endOfMonth.getFullYear() + "-" + (endOfMonth.getMonth() + 1) + "-" + endOfMonth.getDate() + " " + endOfMonth.getHours() + ":" + endOfMonth.getMinutes() + ":" + endOfMonth.getSeconds() 
+
+      var endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      var from =
+        date.getFullYear() +
+        "-" +
+        (date.getMonth() + 1) +
+        "-" +
+        date.getDate() +
+        " " +
+        date.getHours() +
+        ":" +
+        date.getMinutes() +
+        ":" +
+        date.getSeconds();
+      var to =
+        endOfMonth.getFullYear() +
+        "-" +
+        (endOfMonth.getMonth() + 1) +
+        "-" +
+        endOfMonth.getDate() +
+        " " +
+        endOfMonth.getHours() +
+        ":" +
+        endOfMonth.getMinutes() +
+        ":" +
+        endOfMonth.getSeconds();
       let filter = {
-          [columnName]: {
-            between: from + ',' + to
-          }
+        [columnName]: {
+          between: from + "," + to
         }
-      this.$api.getItems(this.$parent.collection, {
-          fields: '*.*.*',
+      };
+      this.$api
+        .getItems(this.$parent.collection, {
+          fields: "*.*.*",
           filter: filter
-        }).then(res => {
-          res.data.forEach(item=>{
-            item.to = 'test'
-          })
-          this.$parent.items = res.data
-          this.$store.dispatch("loadingFinished", 'fetch_cal_items');
-        }).catch( e => {
-          console.log(e)
-          this.$store.dispatch("loadingFinished", 'fetch_cal_items');
         })
+        .then(res => {
+          res.data.forEach(item => {
+            item.to = "test";
+          });
+          this.events = res.data;
+          this.$store.dispatch("loadingFinished", "fetch_cal_items");
+        })
+        .catch(e => {
+          console.log(e);
+          this.$store.dispatch("loadingFinished", "fetch_cal_items");
+        });
     },
     increaseYear() {
       this.swipeTo = "right";
@@ -199,8 +225,6 @@ export default {
     },
 
     openPopup(date) {
-      console.log(date)
-
       this.showPopup = true;
       this.popupDate = date;
     },
@@ -213,25 +237,25 @@ export default {
       var timeId = this.viewOptions.time;
       var colorId = this.viewOptions.color;
 
-      if (!dateId || !titleId) return;
+      if (!(!dateId || !datetimeId) || !titleId) return;
+      
+      for (var i = 0; i < this.events.length; i++) {
+        var item = this.events[i];
 
-      for (var i = 0; i < this.$parent.items.length; i++) {
-        var item = this.$parent.items[i];
-        
-        var eventDate = "", 
-            time = "";
+        var eventDate = "",
+          time = "";
 
         // datetime first
-        if(datetimeId !== '__none__') {
+        if (datetimeId !== "__none__") {
           eventDate = new Date(item[datetimeId]);
           // allow to overridetime of datetime if time field is set
-          if(timeId === '__none__') time = item[datetimeId].slice(-8)
+          if (timeId === "__none__") time = item[datetimeId].slice(-8);
           else time = item[timeId] && timeId != 0 ? item[timeId] : "";
         } else {
           eventDate = new Date(item[dateId] + "T00:00:00");
           time = item[timeId] && timeId != 0 ? item[timeId] : "";
         }
-        
+
         var color = item[colorId];
 
         if (!eventDate) continue;
