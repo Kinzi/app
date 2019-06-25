@@ -12,7 +12,7 @@
             <div id="dates-container">
               <div
                 v-for="day in days"
-                :key="day.date.getDate().toString()"
+                :key="day.date.getDate()"
                 class="dates"
                 @click="changeDay(day.index)"
               >
