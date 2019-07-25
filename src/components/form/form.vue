@@ -186,7 +186,8 @@ export default {
 }
 
 .form > .half,
-.form > .half-left {
+.form > .half-left,
+.form > .half-space {
   grid-column: start / half;
 }
 

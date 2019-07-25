@@ -75,7 +75,7 @@
       "allow_other": "Allow Other",
       "allow_other_comment": "Allow an additional custom option"
     },
-	"fr-FR": {
+	  "fr-FR": {
       "checkboxes": "Cases à cocher",
       "choices": "choix",
       "choices_comment": "Saisir des pairs de clefs et valeurs en JSON avec la valeur enregistrée et le texte affiché",
@@ -85,6 +85,24 @@
       "formatting_comment": "Affiche les valeurs selon un format donné",
       "display_text": "Texte affiché",
       "value": "Valeur"
+    },
+    "tr-TR": {
+      "checkboxes": "Onay Kutusu",
+      "choices": "seçenekler",
+      "choices_comment": "JSON anahtar-değer ikililerini, kaydedilecek değer ve gösterilecek yazı olarak girin",
+      "wrap": "Wrap with Delimiter",
+      "wrap_comment": "Kaydedilen veriyi tırnak işareti içine yerleştir (aranabilirliği arttırır).",
+      "formatting": "Metin Olarak Görüntüle",
+      "formatting_comment": "Değerleri metin olarak görüntüle",
+      "display_text": "Görüntülenecek Metin",
+      "value": "Değer",
+      "option": "Seçenek",
+      "single": "Tek Kolon",
+      "single_comment": "Onay kutusunu tek kolon olarak göster",
+      "draggable": "Sürüklenebilir kutular",
+      "draggable_comment": "Sürüklenebilir kutular ile değiştirilebilir sıralamaya izin verir",
+      "allow_other": "Ek değerlere izin ver",
+      "allow_other_comment": "Öntanımli değerler dışında yeni değerler eklenmesine izin ver"
     }
   }
 }

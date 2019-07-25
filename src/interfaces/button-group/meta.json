@@ -137,6 +137,22 @@
       "flight": "Vol",
       "cruise": "Croisière",
       "other": "Autre"
+    },
+    "tr-TR": {
+      "button_group": "Düğme Grubu",
+      "choices": "seçenekler",
+      "choices_comment":
+        "JSON anahtar-değer ikililerini, kaydedilecek değer ve gösterilecek yazı olarak girin",
+      "theme": "Arayüz Teması",
+      "theme_comment": "Arayüzün nasıl görüntüleneceğini ayarlayın - eğer destekleniyorsa",
+      "value": "Değer",
+      "car": "Araba",
+      "bike": "Bisiklet",
+      "bus": "Otobüs",
+      "train": "Tren",
+      "flight": "Uçuş",
+      "cruise": "Cruise",
+      "other": "Diğer"
     }
   }
 }

@@ -37,7 +37,7 @@
         >
           <div
             v-for="item in itemsSorted"
-            :key="item[junctionRelatedKey][relatedPrimaryKeyField] || item.$tempKey"
+            :key="item[junctionRelatedKey][relatedPrimaryKeyField]"
             class="row"
             @click="startEdit(item[junctionPrimaryKey])"
           >
@@ -269,7 +269,9 @@ export default {
       this.sort.field = "$manual";
     } else {
       // Set the default sort column
-      this.sort.field = this.visibleFields[0].field;
+      if (this.visibleFields && this.visibleFields.length > 0) {
+        this.sort.field = this.visibleFields[0].field;
+      }
     }
 
     // Set the initial set of items. Filter out any broken junction records
@@ -451,7 +453,10 @@ export default {
           }
 
           // If the junction item didn't exist before yet:
-          if (after[this.junctionPrimaryKey].startsWith("$temp_")) {
+          if (
+            typeof after[this.junctionPrimaryKey] === "string" &&
+            after[this.junctionPrimaryKey].startsWith("$temp_")
+          ) {
             delete after[this.junctionPrimaryKey];
           }
 

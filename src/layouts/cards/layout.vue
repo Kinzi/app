@@ -222,6 +222,7 @@ export default {
   }
 
   .icon {
+    pointer-events: none;
     position: absolute;
     right: 0;
     top: 50%;
