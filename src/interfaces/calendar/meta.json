@@ -51,6 +51,6 @@
       "max_comment": "Kullanıcı tarafından seçilebilecek maksimum tarih",
       "formatting": "Tarih Formatı",
       "formatting_comment": "Eğer boş bırakılırsa, ön tanımlı format kullanılacaktır"
-    },
+    }
   }
 }
