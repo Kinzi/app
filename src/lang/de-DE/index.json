@@ -234,7 +234,7 @@
   "is_not_null": "Ist nicht NULL",
   "is_null": "Ist NULL",
   "item_count": "Keine Elemente | Ein Element | {count} Elemente",
-  "item_count_filter": "Keine gefilterten Elemente | Ein gefiltertes Element | {count} gefiltertes Element",
+  "item_count_filter": "Keine Ergebnisse | Ein Ergebnis | {count} Ergebnisse",
   "item_deleted": "Element gelöscht",
   "item_saved": "Element gespeichert | {count} Elemente gespeicherte",
   "junction_collection": "Verbindungssammlung",

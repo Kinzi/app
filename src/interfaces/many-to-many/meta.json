@@ -48,7 +48,7 @@
       "allow_select": "Allow Select",
       "allow_select_comment": "Allow the user to select an existing item"
     },
-	"fr-FR": {
+    "fr-FR": {
       "m2m": "Plusieurs-à-plusieurs (M2M)",
       "visible_columns": "Colonnes visibles",
       "visible_columns_comment": "Ajout d'une liste (SCV) de colonnes à afficher pour la prévisualisation",

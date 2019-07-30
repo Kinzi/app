@@ -129,7 +129,6 @@
 
 <script>
 import mixin from "@directus/extension-toolkit/mixins/interface";
-import { diff } from "deep-object-diff";
 import shortid from "shortid";
 
 export default {
@@ -425,7 +424,7 @@ export default {
           const before = this.initialValue.find(i => i[this.relatedPrimaryKeyField] === primaryKey);
 
           if (before) {
-            const delta = diff(before, after);
+            const delta = _.omitBy(after, (v, k) => before[k] === v);
 
             if (Object.keys(delta).length > 0) {
               const newVal = {

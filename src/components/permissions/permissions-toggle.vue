@@ -1,5 +1,5 @@
 <template>
-  <v-popover placement="right-start" offset="5">
+  <v-popover placement="left-start" offset="5">
     <button class="box" :class="[{ none: value === null }, value]">
       <v-icon v-if="value === 'none'" class="icon" name="close" size="16" />
       <v-icon v-else-if="value === 'mine'" class="icon" name="person" size="16" />
@@ -149,6 +149,7 @@ export default {
     font-weight: 700;
     font-size: 12px;
     color: var(--light-gray);
+    padding: 0 8px;
 
     // Hack to fix misaligned icons
     i {
