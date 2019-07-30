@@ -49,10 +49,13 @@
         <div class="head">
           <!-- Checkboxes -->
           <span />
+          <span v-if="collection === 'directus_files'"> Thumb
+          </span>
           <span v-for="field in fields" :key="field">{{ $helpers.formatTitle(field) }}</span>
         </div>
 
         <label v-for="item in items" :key="uid + '_' + item[primaryKeyField]">
+
           <div class="input">
             <input
               :type="single ? 'radio' : 'checkbox'"
@@ -73,7 +76,19 @@
             />
           </div>
 
+          <span v-if="collection === 'directus_files'">
+            <v-ext-display
+              interface-type="file"
+              name="thumbnail"
+              collection="directus_files"
+              type="JSON"
+              datatype="TEXT"
+              :value="item"
+            />
+          </span>
+
           <span v-for="fieldInfo in fieldsWithInfo" :key="uid + '_' + fieldInfo.field">
+
             <v-ext-display
               :id="uid + '_' + fieldInfo.field"
               :interface-type="fieldInfo.interface"
@@ -83,6 +98,7 @@
               :options="fieldInfo.options"
               :value="item[fieldInfo.field]"
             />
+
           </span>
         </label>
       </div>
@@ -235,6 +251,7 @@ export default {
       .then(res => res.meta)
       .then(meta => (this.totalCount = meta.total_count))
       .catch(error => (this.error = error));
+
   },
 
   methods: {
@@ -263,10 +280,13 @@ export default {
       if (this.filters.length > 0) {
         params.filters = formatFilters(this.filters);
       }
-
-      if (this.fields.length > 0) {
+      
+      if (this.collection === 'directus_files') {
+        params.fields = ['*']
+      } else if (this.fields.length > 0) {
         params.fields = _.clone(this.fields);
-      }
+      }  
+
 
       let sortString = "";
       if (this.sortDirection === "desc") sortString += "-";
@@ -284,6 +304,7 @@ export default {
           this.moreItemsAvailable = items.length === 200;
 
           if (options.replace) return (this.items = items);
+
           return (this.items = [...this.items, ...items]);
         })
         .catch(error => (this.error = error))
@@ -305,6 +326,7 @@ export default {
         this.$emit("input", [...this.value, primaryKey]);
       }
     },
+
 
     // Check if the provided primaryKey is included in the selection
     isChecked(primaryKey) {
