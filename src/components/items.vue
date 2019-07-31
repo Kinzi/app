@@ -393,16 +393,15 @@ export default {
       Object.assign(params, this.viewQuery);
 
       if (this.viewQuery && this.viewQuery.fields) {
-        params.fields = params.fields
-          .split(",")
-          .map(field => `${field}.*`)
-          .join(",");
+        params.fields = params.fields.split(",").map(field => `${field}.*`);
 
         if (!params.fields.includes(this.primaryKeyField)) {
-          params.fields += "," + this.primaryKeyField;
+          params.fields.push(this.primaryKeyField);
         }
+
+        params.fields = params.fields.join(",");
       } else {
-        params.field = "*.*";
+        params.fields = "*.*";
       }
 
       if (this.searchQuery) {

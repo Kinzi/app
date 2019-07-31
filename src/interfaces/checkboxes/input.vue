@@ -1,41 +1,36 @@
 <template>
   <draggable
-    v-model="sortableList"
+    v-model="choices"
     element="div"
     class="interface-checkboxes"
-    :class="{ draggable: options.draggable, single: options.single }"
-    animation="200"
-    ghost-class="ghost"
-    :draggable="options.draggable ? '.sortable-box.sortable' : false"
-    @end="saveSort"
+    :class="{ cols: !options.single }"
   >
-    <template v-for="item in sortableList">
-      <div
-        v-if="item.custom"
-        :key="item.id"
-        class="sortable-box custom-value"
-        :class="{ sortable: options.draggable, checked: customChecked }"
-      >
-        <button @click="toggleCustom">
-          <v-icon :name="customChecked ? 'check_box' : 'check_box_outline_blank'" />
+    <div v-for="(choice, index) in choices" :key="choice.id" class="choice">
+      <v-icon v-if="options.draggable" class="drag-handle" name="drag_indicator" />
+
+      <template v-if="choice.custom">
+        <button @click="choices[index].checked = !choices[index].checked">
+          <v-icon
+            color="darker-gray"
+            :name="choice.checked ? 'check_box' : 'check_box_outline_blank'"
+          />
         </button>
-        <input :value="customValue" :placeholder="$t('other') + '...'" @input="updateCustom" />
-      </div>
+        <input v-model="choices[index].key" :placeholder="$t('other') + '...'" />
+      </template>
 
       <v-checkbox
         v-else
-        :id="item.id + '-' + item.val"
-        :key="item.id"
+        :id="choice.id"
+        v-tooltip="choice.value"
         name="list-sorting"
-        class="sortable-box"
-        :class="{ sortable: options.draggable }"
-        :value="item.val"
+        :value="choice.key"
         :disabled="readonly"
-        :label="item.label"
-        :checked="selection.includes(item.val)"
-        @change="updateValue(item.val, $event)"
+        :label="choice.value"
+        :checked="choice.checked"
+        @change="choices[index].checked = !choices[index].checked"
       />
-    </template>
+    </div>
+    <button v-if="options.allow_other" @click="addCustom">{{ $t("add_new") }}...</button>
   </draggable>
 </template>
 
@@ -46,179 +41,81 @@ import shortid from "shortid";
 export default {
   name: "InterfaceCheckboxes",
   mixins: [mixin],
-
   data() {
     return {
-      sortableList: [],
-      customValue: "",
-      customChecked: false
+      choices: []
     };
   },
+  watch: {
+    choices: {
+      deep: true,
+      handler(val) {
+        if (this.initialized !== true) return;
+        let newValue = val.filter(choice => choice.checked).map(choice => choice.key);
 
-  computed: {
-    // The currently saved selection. It's this.value converted to an array, and
-    // adjusted for the wrapped `,` characters if applicable
-    selection() {
-      if (!this.value) return [];
+        if (this.options.wrap) {
+          newValue = ["", ...newValue, ""];
+        }
 
-      const value = _.clone(this.value);
-      let selection;
-
-      // Convert the value to an array
-      if (typeof this.value === "string") {
-        selection = value.split(",");
-      } else {
-        selection = value;
+        this.$emit("input", newValue);
       }
-
-      if (this.options.wrap) {
-        selection.pop();
-        selection.shift();
-      }
-
-      return selection;
     }
   },
-
   created() {
-    const options = Object.keys(this.options.choices).map(key => ({
-      val: key,
-      label: this.options.choices[key]
-    }));
-
-    let sortableOptions;
-
-    if (this.options.allow_other) {
-      // The user's customly added value is the one value in the selection that doesn't have a preconfigured
-      // label associated with it.
-      const customValue = this.selection.filter(
-        val => Object.keys(this.options.choices).includes(val) === false
-      )[0];
-
-      if (customValue) {
-        this.customValue = customValue;
-        this.customChecked = true;
-      }
-    }
-
-    if (this.options.draggable) {
-      // Convert the selected items and the choices into an array sorted by the
-      // manual sort of the user.
-      const selected = this.selection
-        // Filter out the custom option so we don't add it double down below
-        .filter(val => val !== this.customValue)
-        .map(val => ({
-          val: val,
-          label: this.options.choices[val]
-        }));
-
-      const optionsWithoutSelection = options.filter(
-        option => this.selection.includes(option.val) === false
-      );
-
-      sortableOptions = [...selected, ...optionsWithoutSelection];
-    } else {
-      sortableOptions = options;
-    }
-
-    // Add a unique ID to each sortable option so we can use that to key the items in the template
-    sortableOptions = sortableOptions.map(item => ({
-      ...item,
-      id: shortid.generate(),
-      custom: this.customValue === item.val
-    }));
-
-    if (this.options.allow_other) {
-      sortableOptions.push({
-        id: shortid.generate(),
-        custom: true
-      });
-    }
-
-    this.sortableList = sortableOptions;
+    this.initChoices();
   },
-
   methods: {
-    updateValue(val) {
-      let selection = _.clone(this.selection);
+    initChoices() {
+      const optionChoices = _.clone(this.options.choices);
 
-      if (selection.includes(val)) {
-        selection.splice(selection.indexOf(val), 1);
-      } else {
-        selection.push(val);
+      let choices = this.value
+        .filter(key => key) // filter out empty strings
+        .map(key => {
+          return {
+            id: shortid.generate(),
+            key: key,
+            value: optionChoices[key],
+            custom: optionChoices.hasOwnProperty(key) === false,
+            checked: true
+          };
+        });
+
+      // Remove custom values if "allow_other" is not enabled
+      if (!this.options.allow_other) {
+        choices = choices.filter(function(obj) {
+          return obj.custom !== true;
+        });
       }
 
-      if (this.options.wrap) {
-        selection = ["", ...selection, ""];
-      }
-
-      this.$emit("input", selection);
-    },
-
-    saveSort() {
-      const selection = _.clone(this.selection);
-
-      let staged = this.sortableList
-        // Get all the values of the sorted available checkboxes
-        .map(s => {
-          if (s.custom) return this.customValue;
-          return s.val;
+      const nonChecked = Object.keys(optionChoices)
+        .filter(key => {
+          return this.value.includes(key) === false;
         })
-        // Only leave the ones that are selected
-        .filter(s => selection.includes(s));
+        .map(key => {
+          return {
+            id: shortid.generate(),
+            key: key,
+            value: optionChoices[key],
+            custom: false,
+            checked: false
+          };
+        });
 
-      if (this.options.wrap) {
-        staged = ["", ...staged, ""];
-      }
+      choices = [...choices, ...nonChecked];
 
-      return this.$emit("input", staged);
+      this.choices = choices;
+      this.initialized = true;
     },
-
-    updateCustom(event) {
-      const currentValue = _.clone(this.customValue);
-      const newValue = event.target.value;
-
-      if (newValue.length === 0) {
-        this.customValue = null;
-        this.customChecked = false;
-      } else {
-        this.customValue = newValue;
-        this.customChecked = true;
-      }
-
-      let selection = _.clone(this.selection);
-
-      if (selection.includes(currentValue)) {
-        const index = selection.indexOf(currentValue);
-        selection[index] = newValue;
-      } else {
-        selection = [...selection, newValue];
-      }
-
-      if (this.options.wrap) {
-        selection = ["", ...selection, ""];
-      }
-
-      this.$emit("input", selection);
-    },
-
-    toggleCustom() {
-      this.customChecked = !this.customChecked;
-
-      let selection = _.clone(this.selection);
-      const customValue = _.clone(this.customValue);
-
-      if (this.customChecked && customValue.length > 0) {
-        selection = [...selection, customValue];
-      } else {
-        selection = selection.filter(val => val !== customValue);
-      }
-
-      if (this.options.wrap) {
-        selection = ["", ...selection, ""];
-      }
-
-      this.$emit("input", selection);
+    addCustom() {
+      this.choices = [
+        ...this.choices,
+        {
+          id: shortid.generate(),
+          key: "",
+          custom: true,
+          checked: true
+        }
+      ];
     }
   }
 };
@@ -226,64 +123,35 @@ export default {
 
 <style lang="scss" scoped>
 .interface-checkboxes {
-  width: var(--width-x-large);
-  max-width: 100%;
   display: grid;
-  grid-gap: 20px;
-  grid-template-columns: repeat(1, 1fr);
-
-  @media only screen and (min-width: 330px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media only screen and (min-width: 480px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  @media only screen and (min-width: 800px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  grid-gap: 12px;
 }
 
-.single {
-  grid-template-columns: repeat(1, 1fr);
+.cols {
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
 }
 
-.sortable-box {
-  position: relative;
-  transition: opacity var(--medium) var(--transition),
-    background-color var(--slow) var(--transition);
+.drag-handle {
+  cursor: grab;
 }
 
-.sortable {
-  margin-left: 12px; // To make space to show the drag handle
-
-  &:after {
-    position: absolute;
-    font-family: "Material Icons", sans-serif;
-    display: inline-block;
-    line-height: 1;
-    letter-spacing: normal;
-    vertical-align: middle;
-    content: "drag_indicator";
-    height: 100%;
-    width: 24px;
-    font-size: 24px;
-    left: -20px;
-    color: var(--lighter-gray);
-    cursor: grab;
-    top: 0;
-  }
-}
-
-.custom-value {
+.choice {
   display: flex;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  .form-checkbox {
+    width: 100%;
+  }
 
   input {
     border: 0;
     border-bottom: 1px solid var(--gray);
     width: 100%;
-    margin-left: 4px; // align optically
-    height: 22px; // align optically with icon height
+    margin-left: 4px;
+    width: 100%;
+    max-width: max-content;
   }
 
   input:hover {
@@ -297,28 +165,10 @@ export default {
   input::placeholder {
     color: var(--light-gray);
   }
-
-  i {
-    color: var(--dark-gray);
-  }
-
-  i:hover {
-    color: var(--darkest-gray);
-  }
-
-  &.checked {
-    i {
-      color: var(--darkest-gray);
-    }
-  }
 }
-</style>
 
-<style lang="scss">
-// The styles for the 'drop-preview' eg the ghost item that shifts around in the list to show
-// the user where the item is going to be dropped
-// NOTE: this class is added dynamically and can't be scoped in the style block above
-.ghost {
-  opacity: 0.4;
+button {
+  text-align: left;
+  color: var(--accent);
 }
 </style>
