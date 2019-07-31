@@ -49,13 +49,11 @@
         <div class="head">
           <!-- Checkboxes -->
           <span />
-          <span v-if="collection === 'directus_files'"> Thumb
-          </span>
+          <span v-if="collection === 'directus_files'">{{ $t("file") }}</span>
           <span v-for="field in fields" :key="field">{{ $helpers.formatTitle(field) }}</span>
         </div>
 
         <label v-for="item in items" :key="uid + '_' + item[primaryKeyField]">
-
           <div class="input">
             <input
               :type="single ? 'radio' : 'checkbox'"
@@ -88,7 +86,6 @@
           </span>
 
           <span v-for="fieldInfo in fieldsWithInfo" :key="uid + '_' + fieldInfo.field">
-
             <v-ext-display
               :id="uid + '_' + fieldInfo.field"
               :interface-type="fieldInfo.interface"
@@ -98,7 +95,6 @@
               :options="fieldInfo.options"
               :value="item[fieldInfo.field]"
             />
-
           </span>
         </label>
       </div>
@@ -251,7 +247,6 @@ export default {
       .then(res => res.meta)
       .then(meta => (this.totalCount = meta.total_count))
       .catch(error => (this.error = error));
-
   },
 
   methods: {
@@ -280,13 +275,12 @@ export default {
       if (this.filters.length > 0) {
         params.filters = formatFilters(this.filters);
       }
-      
-      if (this.collection === 'directus_files') {
-        params.fields = ['*']
+
+      if (this.collection === "directus_files") {
+        params.fields = ["*"];
       } else if (this.fields.length > 0) {
         params.fields = _.clone(this.fields);
-      }  
-
+      }
 
       let sortString = "";
       if (this.sortDirection === "desc") sortString += "-";
@@ -326,7 +320,6 @@ export default {
         this.$emit("input", [...this.value, primaryKey]);
       }
     },
-
 
     // Check if the provided primaryKey is included in the selection
     isChecked(primaryKey) {
